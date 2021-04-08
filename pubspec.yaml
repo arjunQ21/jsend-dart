@@ -1,0 +1,10 @@
+name: jsend
+description: Implementation of jsend specification ( a specification that tells how JSON Response are structured) in dart. Details of jsend specification is available at https://github.com/omniti-labs/jsend
+version: 1.0.0
+
+environment:
+  sdk: '>=2.10.0 <3.0.0'
+
+dependencies:
+  http: ^0.12.1
+
