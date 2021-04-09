@@ -2,9 +2,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class jsendResponse {
-  http.Response _httpResponse;
+  late http.Response _httpResponse;
 
-  Map<String, dynamic> payload;
+  late Map<String, dynamic> payload;
   jsendResponse(http.Response response) {
     _httpResponse = response;
     parse();
@@ -17,11 +17,11 @@ class jsendResponse {
     return getKey('status');
   }
 
-  dynamic get data {
+  dynamic? get data {
     return getKey('data');
   }
 
-  String get message {
+  String? get message {
     return getKey('message');
   }
 
@@ -38,7 +38,7 @@ class jsendResponse {
           "' from payload:\n " +
           _httpResponse.body +
           '\nOrignal Error: ' +
-          e);
+          e.toString());
     }
   }
 
@@ -63,7 +63,7 @@ class jsendResponse {
     }
   }
 
-  String errorIn(String key) {
+  String? errorIn(String key) {
     if (!hasErrorIn(key)) return null;
     return data[key];
   }
