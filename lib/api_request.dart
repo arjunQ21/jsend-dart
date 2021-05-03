@@ -14,7 +14,7 @@ class APIRequest {
   late String _url;
   late String _method;
   Map<String, String> _headers = {};
-  Map<String, String> get headers {
+  Map<String, String> get headers { 
     return _headers;
   }
 

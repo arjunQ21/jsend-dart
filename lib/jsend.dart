@@ -1,14 +1,40 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:jsend/api_request.dart';
 
 class jsendResponse {
   late http.Response _httpResponse;
 
+  Function? onError;
+  Function? onFail;
+  Function? onSuccess;
+
+  BuildContext? reportingContext;
+
   late Map<String, dynamic> payload;
-  jsendResponse(http.Response response) {
+  jsendResponse(http.Response response,
+      {this.reportingContext, this.onError, this.onFail, this.onSuccess}) {
     _httpResponse = response;
     parse();
+    var handlers = {'error': onError, 'success': onSuccess, 'fail': onFail};
+    if (handlers[status] != null) {
+      handlers[status]!();
+    }
   }
+  static Future<jsendResponse> fromAPIRequest(APIRequest request,
+      {BuildContext? reportingContext,
+      Function? onError,
+      Function? onFail,
+      Function? onSuccess}) async {
+    var httpResponse = await request.send();
+    return jsendResponse(httpResponse,
+        reportingContext: reportingContext,
+        onError: onError,
+        onFail: onFail,
+        onSuccess: onSuccess);
+  }
+
   http.Response get httpResponse {
     return _httpResponse;
   }

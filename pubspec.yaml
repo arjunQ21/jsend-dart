@@ -7,4 +7,14 @@ environment:
 
 dependencies:
   http: ^0.13.0
+  # qtoast: ^1.0.0+1
+  flutter:
+    sdk: flutter
+
+# dev_dependencies:
+#   flutter_test:
+#     sdk: flutter
+
+# flutter:
+#   uses-material-design: true
 
