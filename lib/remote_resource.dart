@@ -66,30 +66,28 @@ class RemoteResource {
     if (force) _loadedAll = false;
     if (!_loadedAll) {
       (await jsendResponse.fromAPIRequest(
-        APIRequest(
-          path: endpoint,
-        ),
-        onSuccess: (jsendResponse resp) {
-          if (resp.data is List) {
-            _allFromServer = resp.data;
-          } else {
-            if (!resp.data.containsKey(endpoint)) {
-              throw Exception(
-                  'Malformed JSON Structure obtained from server. Didnt find key "data.' +
-                      endpoint +
-                      '" in response.');
-            }
-            _allFromServer = resp.data[endpoint];
+          APIRequest(
+            path: endpoint,
+          ), onSuccess: (jsendResponse resp) {
+        if (resp.data is List) {
+          _allFromServer = resp.data;
+        } else {
+          if (!resp.data.containsKey(endpoint)) {
+            throw Exception(
+                'Malformed JSON Structure obtained from server. Didnt find key "data.' +
+                    endpoint +
+                    '" in response.');
           }
-          
-        },
-      ));
+          _allFromServer = resp.data[endpoint];
+        }
+      }, statusHandlers: statusHandlers));
       _loadedAll = true;
     }
     return _allFromServer;
   }
 
-  Future<Map<String, dynamic>?> get(String id, [bool force = false]) async {
+  Future<Map<String, dynamic>?> get(String id,
+      {bool force = false, JsendStatusHandlers? statusHandlers}) async {
     var hasLoadedCopy = _hasLoadedID(id);
     if (force) hasLoadedCopy = false;
     if (!hasLoadedCopy) {
@@ -98,23 +96,28 @@ class RemoteResource {
         onSuccess: (jsendResponse res) {
           _setItem(_getSingluarDataFromJsendResponse(res));
         },
+        statusHandlers: statusHandlers,
       ));
     }
     return _getLoadedItemByID(id);
   }
 
-  Future<void> createItem(Map<String, dynamic> itemDetails) async {
+  Future<void> createItem(Map<String, dynamic> itemDetails,
+      {JsendStatusHandlers? statusHandlers}) async {
     (await jsendResponse.fromAPIRequest(
-        APIRequest(
-          path: endpoint,
-          payload: itemDetails,
-          method: 'POST',
-        ), onSuccess: (jsendResponse res) {
-      _setItem(_getSingluarDataFromJsendResponse(res));
-    }));
+      APIRequest(
+        path: endpoint,
+        payload: itemDetails,
+        method: 'POST',
+      ),
+      onSuccess: (jsendResponse res) {
+        _setItem(_getSingluarDataFromJsendResponse(res));
+      },
+      statusHandlers: statusHandlers,
+    ));
   }
 
-  Future<void> updateItem(Map<String, dynamic> updatedItem) async {
+  Future<void> updateItem(Map<String, dynamic> updatedItem, {JsendStatusHandlers? statusHandlers}) async {
     if (!updatedItem.containsKey('_id')) {
       throw Exception('_id not found in given input item.');
     }
@@ -128,10 +131,11 @@ class RemoteResource {
       onSuccess: (jsendResponse res) {
         _setItem(_getSingluarDataFromJsendResponse(res));
       },
+      statusHandlers: statusHandlers,
     ));
   }
 
-  Future<void> deleteItem(Map<String, dynamic> itemToDelete) async {
+  Future<void> deleteItem(Map<String, dynamic> itemToDelete,{JsendStatusHandlers? statusHandlers}) async {
     if (!itemToDelete.containsKey('_id')) {
       throw Exception('_id not found in given input item.');
     }
@@ -145,6 +149,7 @@ class RemoteResource {
           _allFromServer.remove(_getLoadedItemByID(itemToDelete['_id']));
         }
       },
+      statusHandlers: statusHandlers
     ));
   }
 }

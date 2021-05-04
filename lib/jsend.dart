@@ -1,6 +1,11 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:jsend/api_request.dart';
+import './api_request.dart';
+
+// Exporting from this file import
+
+export './api_request.dart';
+export './remote_resource.dart';
 
 typedef jsendStatusHandler = void Function(jsendResponse response);
 
@@ -22,8 +27,6 @@ class jsendResponse {
   jsendStatusHandler? onFail = defaultStatusHandler;
   jsendStatusHandler? onSuccess = defaultStatusHandler;
 
-  Map<String, List<jsendStatusHandler>> _handlers = {};
-
   late Map<String, dynamic> payload;
 
   jsendResponse._fromPayload(
@@ -34,8 +37,6 @@ class jsendResponse {
     JsendStatusHandlers? statusHandlers,
   }) {
     if (statusHandlers != null) this.statusHandlers = statusHandlers;
-    // _checkHandlersConflict();
-    // _populateHandlers();
     _callHandlers();
   }
 
@@ -47,8 +48,6 @@ class jsendResponse {
     _httpResponse = response;
     if (statusHandlers != null) this.statusHandlers = statusHandlers;
     parse();
-    // _checkHandlersConflict();
-    // _populateHandlers();
     _callHandlers();
   }
 

@@ -15,3 +15,9 @@
 - Added jsendResponse.fromAPIRequest
 - Added onError, onSuccess and onFail handlers to jsendResponse object's constructor
 - Added toString method to jsendResponse
+
+## 1.0.4
+
+- JsendStatusHandlers can be passed in through constructor
+- Multiple status handlers for same status can now be run. For example, for success, they can be called with onSuccess and statusHandler.forSuccess
+- RemoteResource Model is added. It can be used to perform CRUD operation on jsend based APIs very easily.
