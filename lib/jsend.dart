@@ -1,38 +1,132 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:jsend/api_request.dart';
+
+typedef jsendStatusHandler = void Function(jsendResponse response);
+
+final jsendStatusHandler defaultStatusHandler = (jsendResponse response) {
+  print(response);
+};
+
+class JsendStatusHandlers {
+  jsendStatusHandler? forError, forSuccess, forFail;
+  JsendStatusHandlers({this.forError, this.forFail, this.forSuccess});
+}
 
 class jsendResponse {
   late http.Response _httpResponse;
 
-  Function? onError;
-  Function? onFail;
-  Function? onSuccess;
+  JsendStatusHandlers statusHandlers = JsendStatusHandlers();
 
-  BuildContext? reportingContext;
+  jsendStatusHandler? onError = defaultStatusHandler;
+  jsendStatusHandler? onFail = defaultStatusHandler;
+  jsendStatusHandler? onSuccess = defaultStatusHandler;
+
+  Map<String, List<jsendStatusHandler>> _handlers = {};
 
   late Map<String, dynamic> payload;
+
+  jsendResponse._fromPayload(
+    this.payload, {
+    this.onError,
+    this.onFail,
+    this.onSuccess,
+    JsendStatusHandlers? statusHandlers,
+  }) {
+    if (statusHandlers != null) this.statusHandlers = statusHandlers;
+    // _checkHandlersConflict();
+    // _populateHandlers();
+    _callHandlers();
+  }
+
   jsendResponse(http.Response response,
-      {this.reportingContext, this.onError, this.onFail, this.onSuccess}) {
+      {this.onError,
+      this.onFail,
+      this.onSuccess,
+      JsendStatusHandlers? statusHandlers}) {
     _httpResponse = response;
+    if (statusHandlers != null) this.statusHandlers = statusHandlers;
     parse();
-    var handlers = {'error': onError, 'success': onSuccess, 'fail': onFail};
-    if (handlers[status] != null) {
-      handlers[status]!();
+    // _checkHandlersConflict();
+    // _populateHandlers();
+    _callHandlers();
+  }
+
+  // void _checkHandlersConflict() {
+  //   if (statusHandlers.forError != null && onError != null) {
+  //     throw Exception(
+  //         'Handlers conflict. Only one of onError or statusHanders.forError can be used.');
+  //   }
+  //   if (statusHandlers.forSuccess != null && onSuccess != null) {
+  //     throw Exception(
+  //         'Handlers conflict. Only one of onSuccess or statusHanders.forSuccess can be used.');
+  //   }
+  //   if (statusHandlers.forFail != null && onFail != null) {
+  //     throw Exception(
+  //         'Handlers conflict. Only one of onFail or statusHanders.forFail can be used.');
+  //   }
+  // }
+
+//   void _populateHandlers() {
+//     // call all handlers coming from statusHandlers or on...
+// //more priority will be given to onError, onSuccess and onFail, rather than those coming from statusHandlers
+// //
+// //default will be defaultStatusHandler
+
+//     // onError ??= statusHandlers.forError ?? defaultStatusHandler;
+//     // onSuccess ??= statusHandlers.forSuccess ?? defaultStatusHandler;
+//     // onFail ??= statusHandlers.forFail ?? defaultStatusHandler;
+
+//     // var handlers = {onError, onFail, onSuccess};
+//   }
+
+  void _callHandlers() {
+    var calledOneHanlder = false;
+    var allHandlers = {
+      'error': [onError, statusHandlers.forError],
+      'success': [onSuccess, statusHandlers.forSuccess],
+      'fail': [onFail, statusHandlers.forFail]
+    };
+    allHandlers.forEach((status, handlers) {
+      if (this.status == status) {
+        handlers.forEach((handler) {
+          if (handler != null) {
+            handler(this);
+            calledOneHanlder = true;
+          }
+        });
+      }
+    });
+    if (!calledOneHanlder) {
+      defaultStatusHandler(this);
     }
   }
-  static Future<jsendResponse> fromAPIRequest(APIRequest request,
-      {BuildContext? reportingContext,
-      Function? onError,
-      Function? onFail,
-      Function? onSuccess}) async {
-    var httpResponse = await request.send();
-    return jsendResponse(httpResponse,
-        reportingContext: reportingContext,
-        onError: onError,
-        onFail: onFail,
-        onSuccess: onSuccess);
+
+  static Future<jsendResponse> fromAPIRequest(
+    APIRequest request, {
+    jsendStatusHandler? onError,
+    jsendStatusHandler? onFail,
+    jsendStatusHandler? onSuccess,
+    JsendStatusHandlers? statusHandlers,
+  }) async {
+    try {
+      var httpResponse = await request.send();
+      return jsendResponse(httpResponse,
+          onError: onError,
+          onFail: onFail,
+          onSuccess: onSuccess,
+          statusHandlers: statusHandlers);
+    } catch (e) {
+      print(e);
+      print('Connection Error');
+      var r = jsendResponse._fromPayload(
+          {'status': 'error', 'message': 'HTTP Error: ' + e.toString()},
+          onError: onError,
+          onFail: onFail,
+          onSuccess: onSuccess,
+          statusHandlers: statusHandlers);
+      return r;
+    }
   }
 
   http.Response get httpResponse {
@@ -45,6 +139,11 @@ class jsendResponse {
 
   dynamic? get data {
     return getKey('data');
+  }
+
+  @override
+  String toString() {
+    return payload.toString();
   }
 
   String? get message {
@@ -72,15 +171,27 @@ class jsendResponse {
     try {
       payload = jsonDecode(_httpResponse.body);
     } on FormatException catch (_, e) {
-      throw Exception(
-          "Response from server is not JSON. Server's Response: \n" +
-              _httpResponse.body +
-              'original error: ' +
-              e.toString());
+      // Generating Custom Error on some error
+      payload = {
+        'status': 'error',
+        'message': 'The response is not JSON. Server\'s Response: \n' +
+            _httpResponse.body +
+            'original error: ' +
+            e.toString()
+      };
+    } catch (e) {
+      payload = {
+        'status': 'error',
+        'message': 'Error Occurred: ' +
+            _httpResponse.body +
+            'original error: ' +
+            e.toString()
+      };
     }
   }
 
   bool hasErrorIn(String key) {
+    if (status != 'fail') return false;
     if (data == null) return false;
     if (data is Map) {
       return data.containsKey(key);

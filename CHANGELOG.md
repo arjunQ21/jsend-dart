@@ -9,3 +9,9 @@
 ## 1.0.2-pre-release
 
 - Moved to lib folder
+
+## 1.0.3
+
+- Added jsendResponse.fromAPIRequest
+- Added onError, onSuccess and onFail handlers to jsendResponse object's constructor
+- Added toString method to jsendResponse

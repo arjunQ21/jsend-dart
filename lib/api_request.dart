@@ -57,15 +57,13 @@ class APIRequest {
     }
     _method = method;
     _payload = payload;
-    // if (_method == 'GET') _payload = null;
   }
   Future<http.Response> send() {
-    // var url = _base + _uri;
+    
     switch (_method) {
       case 'GET':
       case 'DELETE':
         return _acceptedMethods[_method]!(Uri.parse(_url), headers: _headers);
-      // break;
       default:
         return _acceptedMethods[_method]!(Uri.parse(_url),
             headers: _headers, body: jsonEncode(_payload));
