@@ -80,7 +80,7 @@ This package helps us by assigning the status handlers in constructor of jsendRe
 
 ## RemoteResource class might surprise you
 
-See how easily I perform CRUD operations on data from server.
+See how easily I perform CRUD operations on data on server.
 
     //setting API Base first
     APIRequset.base = 'http://your-server/api/' ;
