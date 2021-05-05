@@ -7,30 +7,36 @@ import 'package:jsend/jsend.dart';
 void main() async {
   APIRequest.base = 'http://localhost:5000/api/dalle/';
   var resource = RemoteResource('addons');
-  var all = await resource.getAll(
-    statusHandlers: JsendStatusHandlers(
-      forSuccess: (_) {
-        print('Successfully fetched.');
-      },
-      forError: (_) {
-        print('Error Fetching.');
-      },
-    ),
-  );
+  // var all = await resource.getAll(
+  //     // statusHandlers: [JsendStatusHandler(
+  //     //   forSuccess: (_) {
+  //     //     print('Successfully fetched.');
+  //     //   },
+  //     //   forError: (_) {
+  //     //     print('Error Fetching.');
+  //     //   },
+  //     // ),]
+  //     );
 
-  print(all);
+  // print(all);
   //
-  // var jr = jsendResponse.fromAPIRequest(
-  //   APIRequest(path: 'quantities'),
-  //   onError: (jsendResponse r) {
-  //     print('1');
-  //   },
-  //   onFail: defaultStatusHandler,
-  //   statusHandlers: JsendStatusHandlers(forError: (jsr) {
-  //     print('2');
-  //     // print(jsr);
-  //   }),
-  // );
+  var jr = jsendResponse.fromAPIRequest(
+    APIRequest(path: 'quantities'),
+    // onError: (jsendResponse r) {
+    //   print('1');
+    // },
+    // onFail: defaultStatusHandler,
+    // onSuccess: (_) {
+    //   print("qwe");
+    // },
+    // statusHandlers: [
+    //   JsendStatusHandler(forError: (jsr) {
+    //     print('2');
+    //   }, forSuccess: (_) {
+    //     print("asd");
+    //   })
+    // ],
+  );
 
   // var rand = Random();
 

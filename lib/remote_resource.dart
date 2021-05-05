@@ -62,7 +62,7 @@ class RemoteResource {
   }
 
   Future<List> getAll(
-      {bool force = false, JsendStatusHandlers? statusHandlers}) async {
+      {bool force = false, List<JsendStatusHandler>? statusHandlers}) async {
     if (force) _loadedAll = false;
     if (!_loadedAll) {
       (await jsendResponse.fromAPIRequest(
@@ -87,7 +87,7 @@ class RemoteResource {
   }
 
   Future<Map<String, dynamic>?> get(String id,
-      {bool force = false, JsendStatusHandlers? statusHandlers}) async {
+      {bool force = false, List<JsendStatusHandler>? statusHandlers}) async {
     var hasLoadedCopy = _hasLoadedID(id);
     if (force) hasLoadedCopy = false;
     if (!hasLoadedCopy) {
@@ -103,7 +103,7 @@ class RemoteResource {
   }
 
   Future<void> createItem(Map<String, dynamic> itemDetails,
-      {JsendStatusHandlers? statusHandlers}) async {
+      {List<JsendStatusHandler>? statusHandlers}) async {
     (await jsendResponse.fromAPIRequest(
       APIRequest(
         path: endpoint,
@@ -117,7 +117,7 @@ class RemoteResource {
     ));
   }
 
-  Future<void> updateItem(Map<String, dynamic> updatedItem, {JsendStatusHandlers? statusHandlers}) async {
+  Future<void> updateItem(Map<String, dynamic> updatedItem, {List<JsendStatusHandler>? statusHandlers}) async {
     if (!updatedItem.containsKey('_id')) {
       throw Exception('_id not found in given input item.');
     }
@@ -135,7 +135,7 @@ class RemoteResource {
     ));
   }
 
-  Future<void> deleteItem(Map<String, dynamic> itemToDelete,{JsendStatusHandlers? statusHandlers}) async {
+  Future<void> deleteItem(Map<String, dynamic> itemToDelete,{List<JsendStatusHandler>? statusHandlers}) async {
     if (!itemToDelete.containsKey('_id')) {
       throw Exception('_id not found in given input item.');
     }

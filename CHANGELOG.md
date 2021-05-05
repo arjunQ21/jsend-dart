@@ -21,3 +21,7 @@
 - JsendStatusHandlers can be passed in through constructor
 - Multiple status handlers for same status can now be run. For example, for success, they can be called with onSuccess and statusHandler.forSuccess
 - RemoteResource Model is added. It can be used to perform CRUD operation on jsend based APIs very easily.
+
+## 1.0.5
+- Changed JsendStatusHandlers to JsendStatusHandler
+- Now array of status handlers can be passed. Rather than single status Handler

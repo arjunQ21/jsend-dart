@@ -1,6 +1,6 @@
 name: jsend
 description: Implementation of jsend specification in dart. 
-version: 1.0.4
+version: 1.0.5
 repository: https://github.com/arjunQ21/jsend-dart
 environment:
   sdk: ">=2.12.0 <3.0.0"

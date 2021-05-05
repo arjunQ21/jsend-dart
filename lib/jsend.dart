@@ -13,15 +13,15 @@ final jsendStatusHandler defaultStatusHandler = (jsendResponse response) {
   print(response);
 };
 
-class JsendStatusHandlers {
+class JsendStatusHandler {
   jsendStatusHandler? forError, forSuccess, forFail;
-  JsendStatusHandlers({this.forError, this.forFail, this.forSuccess});
+  JsendStatusHandler({this.forError, this.forFail, this.forSuccess});
 }
 
 class jsendResponse {
   late http.Response _httpResponse;
 
-  JsendStatusHandlers statusHandlers = JsendStatusHandlers();
+  List<JsendStatusHandler> statusHandlers = [];
 
   jsendStatusHandler? onError = defaultStatusHandler;
   jsendStatusHandler? onFail = defaultStatusHandler;
@@ -34,7 +34,7 @@ class jsendResponse {
     this.onError,
     this.onFail,
     this.onSuccess,
-    JsendStatusHandlers? statusHandlers,
+    List<JsendStatusHandler>? statusHandlers,
   }) {
     if (statusHandlers != null) this.statusHandlers = statusHandlers;
     _callHandlers();
@@ -44,59 +44,45 @@ class jsendResponse {
       {this.onError,
       this.onFail,
       this.onSuccess,
-      JsendStatusHandlers? statusHandlers}) {
+      List<JsendStatusHandler>? statusHandlers}) {
     _httpResponse = response;
     if (statusHandlers != null) this.statusHandlers = statusHandlers;
     parse();
     _callHandlers();
   }
 
-  // void _checkHandlersConflict() {
-  //   if (statusHandlers.forError != null && onError != null) {
-  //     throw Exception(
-  //         'Handlers conflict. Only one of onError or statusHanders.forError can be used.');
-  //   }
-  //   if (statusHandlers.forSuccess != null && onSuccess != null) {
-  //     throw Exception(
-  //         'Handlers conflict. Only one of onSuccess or statusHanders.forSuccess can be used.');
-  //   }
-  //   if (statusHandlers.forFail != null && onFail != null) {
-  //     throw Exception(
-  //         'Handlers conflict. Only one of onFail or statusHanders.forFail can be used.');
-  //   }
-  // }
-
-//   void _populateHandlers() {
-//     // call all handlers coming from statusHandlers or on...
-// //more priority will be given to onError, onSuccess and onFail, rather than those coming from statusHandlers
-// //
-// //default will be defaultStatusHandler
-
-//     // onError ??= statusHandlers.forError ?? defaultStatusHandler;
-//     // onSuccess ??= statusHandlers.forSuccess ?? defaultStatusHandler;
-//     // onFail ??= statusHandlers.forFail ?? defaultStatusHandler;
-
-//     // var handlers = {onError, onFail, onSuccess};
-//   }
-
   void _callHandlers() {
     var calledOneHanlder = false;
-    var allHandlers = {
-      'error': [onError, statusHandlers.forError],
-      'success': [onSuccess, statusHandlers.forSuccess],
-      'fail': [onFail, statusHandlers.forFail]
+
+    var allOnHanlders = {
+      'error': onError,
+      'success': onSuccess,
+      'fail': onFail
     };
-    allHandlers.forEach((status, handlers) {
-      if (this.status == status) {
-        handlers.forEach((handler) {
-          if (handler != null) {
-            handler(this);
-            calledOneHanlder = true;
-          }
-        });
+    allOnHanlders.forEach((key, hanlder) {
+      if (allOnHanlders[key] != null) {
+        calledOneHanlder = true;
+        allOnHanlders[key]!(this);
       }
     });
+
+    // calling hanlders from statusHanlders list
+
+    statusHandlers.forEach((statusHandler) {
+      var config = {
+        'error': statusHandler.forError,
+        'success': statusHandler.forSuccess,
+        'fail': statusHandler.forFail
+      };
+      if (config[status] != null) {
+        calledOneHanlder = true;
+        config[status]!(this);
+      }
+    });
+
+    // print('Called 1 hanlder: ' + calledOneHanlder.toString());
     if (!calledOneHanlder) {
+      // print('calling default handler');
       defaultStatusHandler(this);
     }
   }
@@ -106,7 +92,7 @@ class jsendResponse {
     jsendStatusHandler? onError,
     jsendStatusHandler? onFail,
     jsendStatusHandler? onSuccess,
-    JsendStatusHandlers? statusHandlers,
+    List<JsendStatusHandler>? statusHandlers,
   }) async {
     try {
       var httpResponse = await request.send();

@@ -107,7 +107,7 @@ Creating new product
 
 Worried about handling validation Errors from server ? You can easily handle them as:
 
-    await productsFetcher.createItem({...}, statusHanlders: JsendStatusHandlers(
+    await productsFetcher.createItem({...}, statusHandlers: [JsendStatusHandler(
         forError: (jsendResponse resp){...},
         forSuccess: (jsendResponse resp){...},
         forFail: (jsendResponse resp){
@@ -115,7 +115,7 @@ Worried about handling validation Errors from server ? You can easily handle the
                 print('Response contains error in name: ' + resp.errorIn('name')) ;
             }
         }
-    ))
+    )])
 
 statusHandlers can be applied to all methods of RemoteResource
 
@@ -127,11 +127,11 @@ Updating Product
 Deleting Product
 
     //mapped to DELETE /products/:product_id
-    await productsFetcher.deleteItem({_id: 'id',...}, statusHandlers: JsendStatusHandlers(
+    await productsFetcher.deleteItem({_id: 'id',...}, statusHandlers: [JsendStatusHandler(
         forSuccess: (_){
             print("Deleted Successfully.") ;
         }
-    ));
+    )]);
 
 
 
