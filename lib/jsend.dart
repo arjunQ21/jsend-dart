@@ -61,8 +61,11 @@ class jsendResponse {
     };
     allOnHanlders.forEach((key, hanlder) {
       if (allOnHanlders[key] != null) {
-        calledOneHanlder = true;
-        allOnHanlders[key]!(this);
+        if (status == key) {
+          print("calling handler with key '$status'");
+          calledOneHanlder = true;
+          allOnHanlders[key]!(this);
+        }
       }
     });
 
@@ -74,10 +77,14 @@ class jsendResponse {
         'success': statusHandler.forSuccess,
         'fail': statusHandler.forFail
       };
-      if (config[status] != null) {
-        calledOneHanlder = true;
-        config[status]!(this);
-      }
+      config.forEach((key, handler) {
+        if (status == key) {
+          if (config[status] != null) {
+            calledOneHanlder = true;
+            config[status]!(this);
+          }
+        }
+      });
     });
 
     // print('Called 1 hanlder: ' + calledOneHanlder.toString());
@@ -104,8 +111,11 @@ class jsendResponse {
     } catch (e) {
       print(e);
       print('Connection Error');
-      var r = jsendResponse._fromPayload(
-          {'status': 'error', 'message': 'HTTP Error: ' + e.toString()},
+      var r = jsendResponse._fromPayload({
+        'status': 'error',
+        'message': 'HTTP Error: ' + e.toString(),
+        'data': {}
+      },
           onError: onError,
           onFail: onFail,
           onSuccess: onSuccess,

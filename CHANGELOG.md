@@ -25,3 +25,7 @@
 ## 1.0.5
 - Changed JsendStatusHandlers to JsendStatusHandler
 - Now array of status handlers can be passed. Rather than single status Handler
+
+## 1.0.6
+
+- Status Handlers Bug Fixed
