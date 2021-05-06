@@ -79,9 +79,9 @@ class jsendResponse {
       };
       config.forEach((key, handler) {
         if (status == key) {
-          if (config[status] != null) {
+          if (handler != null) {
             calledOneHanlder = true;
-            config[status]!(this);
+            handler(this);
           }
         }
       });
@@ -108,8 +108,9 @@ class jsendResponse {
           onFail: onFail,
           onSuccess: onSuccess,
           statusHandlers: statusHandlers);
-    } catch (e) {
+    } catch (e, trace) {
       print(e);
+      print(trace);
       print('Connection Error');
       var r = jsendResponse._fromPayload({
         'status': 'error',
@@ -133,7 +134,7 @@ class jsendResponse {
   }
 
   dynamic? get data {
-    return getKey('data');
+    return getKey('data') ?? {};
   }
 
   @override
@@ -142,7 +143,12 @@ class jsendResponse {
   }
 
   String? get message {
-    return getKey('message');
+    // return getKey('message') ?? data.message ?? data ?? data.error ?? data;
+    print("hi");
+    if (getKey('message') != null) return getKey('message');
+    if (data.containsKey('message')) return data['message'].toString();
+    if (data.containsKey('error')) return data['error'].toString();
+    return data.toString();
   }
 
   dynamic getKey(String key) {
