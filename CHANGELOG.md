@@ -29,3 +29,15 @@
 ## 1.0.6
 
 - Status Handlers Bug Fixed
+
+## 1.0.7
+
+- Bug Fixes
+
+## 1.0.8
+
+- Bug Fixes
+
+## 1.0.9
+
+- Made Default Headers of APIRequest editable anytime

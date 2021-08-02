@@ -130,10 +130,14 @@ class jsendResponse {
   }
 
   String get status {
-    return getKey('status');
+    if (getKey('status') != null) return getKey('status');
+    // print('Invalid Jsend');
+    print(this);
+    throw Exception("Invalid Jsend. Key 'status' not found.");
+    // return 'undefined';
   }
 
-  dynamic? get data {
+  dynamic get data {
     return getKey('data') ?? {};
   }
 
@@ -144,7 +148,7 @@ class jsendResponse {
 
   String? get message {
     // return getKey('message') ?? data.message ?? data ?? data.error ?? data;
-    print("hi");
+    print('hi');
     if (getKey('message') != null) return getKey('message');
     if (data.containsKey('message')) return data['message'].toString();
     if (data.containsKey('error')) return data['error'].toString();

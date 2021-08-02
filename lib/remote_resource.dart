@@ -4,6 +4,10 @@ import 'jsend.dart';
 class RemoteResource {
   final String endpoint;
 
+  String get multipleDataKey {
+    return endpoint.split('/').last;
+  }
+
   late String singularName;
 
   List _allFromServer = [];
@@ -72,13 +76,13 @@ class RemoteResource {
         if (resp.data is List) {
           _allFromServer = resp.data;
         } else {
-          if (!resp.data.containsKey(endpoint)) {
+          if (!resp.data.containsKey(multipleDataKey)) {
             throw Exception(
                 'Malformed JSON Structure obtained from server. Didnt find key "data.' +
                     endpoint +
                     '" in response.');
           }
-          _allFromServer = resp.data[endpoint];
+          _allFromServer = resp.data[multipleDataKey];
         }
       }, statusHandlers: statusHandlers));
       _loadedAll = true;
@@ -104,6 +108,7 @@ class RemoteResource {
 
   Future<void> createItem(Map<String, dynamic> itemDetails,
       {List<JsendStatusHandler>? statusHandlers}) async {
+    itemDetails.remove('_id');
     (await jsendResponse.fromAPIRequest(
       APIRequest(
         path: endpoint,
@@ -117,7 +122,8 @@ class RemoteResource {
     ));
   }
 
-  Future<void> updateItem(Map<String, dynamic> updatedItem, {List<JsendStatusHandler>? statusHandlers}) async {
+  Future<void> updateItem(Map<String, dynamic> updatedItem,
+      {List<JsendStatusHandler>? statusHandlers}) async {
     if (!updatedItem.containsKey('_id')) {
       throw Exception('_id not found in given input item.');
     }
@@ -135,21 +141,19 @@ class RemoteResource {
     ));
   }
 
-  Future<void> deleteItem(Map<String, dynamic> itemToDelete,{List<JsendStatusHandler>? statusHandlers}) async {
+  Future<void> deleteItem(Map<String, dynamic> itemToDelete,
+      {List<JsendStatusHandler>? statusHandlers}) async {
     if (!itemToDelete.containsKey('_id')) {
       throw Exception('_id not found in given input item.');
     }
     (await jsendResponse.fromAPIRequest(
-      APIRequest(
-        path: endpoint + '/' + itemToDelete['_id'],
-        method: 'DELETE',
-      ),
-      onSuccess: (jsendResponse res) {
-        if (_loadedAll) {
-          _allFromServer.remove(_getLoadedItemByID(itemToDelete['_id']));
-        }
-      },
-      statusHandlers: statusHandlers
-    ));
+        APIRequest(
+          path: endpoint + '/' + itemToDelete['_id'],
+          method: 'DELETE',
+        ), onSuccess: (jsendResponse res) {
+      if (_loadedAll) {
+        _allFromServer.remove(_getLoadedItemByID(itemToDelete['_id']));
+      }
+    }, statusHandlers: statusHandlers));
   }
 }

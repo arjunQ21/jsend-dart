@@ -14,7 +14,7 @@ class APIRequest {
   late String _url;
   late String _method;
   Map<String, String> _headers = {};
-  Map<String, String> get headers { 
+  Map<String, String> get headers {
     return _headers;
   }
 
@@ -23,9 +23,22 @@ class APIRequest {
   }
 
   Map<String, dynamic>? _payload = {};
-  static final Map<String, String> _defaultHeaders = {
+  // ignore: prefer_final_fields
+  static Map<String, String> _defaultHeaders = {
     'Content-Type': 'application/json'
   };
+
+  // ignore: always_declare_return_types
+  static addDefaultHeaders(Map<String, String> h) {
+    _defaultHeaders.addAll(h);
+  }
+
+  // ignore: always_declare_return_types
+  static removeDefaultHeaders(Map<String, String> h) {
+    h.forEach((key, value) {
+      _defaultHeaders.remove(key);
+    });
+  }
 
   APIRequest(
       {String? url,
@@ -59,7 +72,6 @@ class APIRequest {
     _payload = payload;
   }
   Future<http.Response> send() {
-    
     switch (_method) {
       case 'GET':
       case 'DELETE':
