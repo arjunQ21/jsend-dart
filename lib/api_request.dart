@@ -71,6 +71,10 @@ class APIRequest {
     _method = method;
     _payload = payload;
   }
+  void clearHeaders() {
+    _headers = {};
+  }
+
   Future<http.Response> send() {
     switch (_method) {
       case 'GET':

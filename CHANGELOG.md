@@ -41,3 +41,11 @@
 ## 1.0.9
 
 - Made Default Headers of APIRequest editable anytime
+
+## 1.0.10
+
+- multipleDataKey added in remote resource
+
+## 1.0.11
+
+- can clear headers from API Request now
