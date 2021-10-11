@@ -29,7 +29,7 @@ class jsendResponse {
 
   late Map<String, dynamic> payload;
 
-  jsendResponse._fromPayload(
+  jsendResponse.fromPayload(
     this.payload, {
     this.onError,
     this.onFail,
@@ -112,7 +112,7 @@ class jsendResponse {
       print(e);
       print(trace);
       print('Connection Error');
-      var r = jsendResponse._fromPayload({
+      var r = jsendResponse.fromPayload({
         'status': 'error',
         'message': 'HTTP Error: ' + e.toString(),
         'data': {}

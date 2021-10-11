@@ -49,3 +49,11 @@
 ## 1.0.11
 
 - can clear headers from API Request now
+
+## 1.0.12
+
+- can clear specific headers from API Request now
+
+## 1.0.13
+
+- jsendResponse objects can now be created from payload.

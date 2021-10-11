@@ -75,6 +75,12 @@ class APIRequest {
     _headers = {};
   }
 
+  void removeHeader(key) {
+    if (_headers.containsKey(key)) {
+      _headers.remove(key);
+    }
+  }
+
   Future<http.Response> send() {
     switch (_method) {
       case 'GET':
