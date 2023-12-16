@@ -9,7 +9,8 @@ class APIRequest {
     'GET': http.get,
     'POST': http.post,
     'PUT': http.put,
-    'DELETE': http.delete
+    'DELETE': http.delete,
+    'PATCH': http.patch,
   };
   late String _url;
   late String _method;
